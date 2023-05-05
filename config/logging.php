@@ -3,6 +3,14 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+// 로깅 채널 정의
+$stackChannels = ['daily'];
+$stackCliChannels = ['cli_channel'];
+
+if (!empty(env('LOG_SLACK_WEBHOOK_URL'))) {
+    $stackChannels[] = 'slack';
+    $stackCliChannels[] = 'slack';
+}
 
 return [
 
@@ -53,7 +61,12 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => $stackChannels,
+            'ignore_exceptions' => false,
+        ],
+        'cli' => [
+            'driver' => 'stack',
+            'channels' => $stackCliChannels,
             'ignore_exceptions' => false,
         ],
 
@@ -76,12 +89,23 @@ return [
             'url' => env('APP_URL'),
         ],
 
+        // console 용 channel
+        'cli_channel' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-cli.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'permission' => 0664, // 파일 권한 설정
+            'file_permission' => 0664, // 로그 파일 권한 설정
+            'url' => env('APP_URL'),
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => env('LOG_SLACK_USER_NAME','log bot'),
             'emoji' => ':boom:',
-            'level' => env('LOG_LEVEL', 'critical'),
+            'level' => 'error',
         ],
 
         'papertrail' => [
