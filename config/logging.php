@@ -3,14 +3,6 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
-// 로깅 채널 정의
-$stackChannels = ['daily'];
-$stackCliChannels = ['cli_channel'];
-
-if (!empty(env('LOG_SLACK_WEBHOOK_URL'))) {
-    $stackChannels[] = 'slack';
-    $stackCliChannels[] = 'slack';
-}
 
 return [
 
@@ -61,12 +53,13 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => $stackChannels,
+            'channels' => ['daily','slack'],
             'ignore_exceptions' => false,
         ],
+
         'cli' => [
             'driver' => 'stack',
-            'channels' => $stackCliChannels,
+            'channels' => ['cli_channel','slack'],
             'ignore_exceptions' => false,
         ],
 
@@ -105,7 +98,7 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => env('LOG_SLACK_USER_NAME','log bot'),
             'emoji' => ':boom:',
-            'level' => 'error',
+            'level' => env('LOG_LEVEL', 'debug'),
         ],
 
         'papertrail' => [
