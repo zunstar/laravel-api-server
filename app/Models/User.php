@@ -40,4 +40,13 @@ class User extends Authenticatable
      */
     protected $casts = [
     ];
+
+    /**
+     * The clients that belong to the user.
+     */
+    public function clients()
+    {
+        return $this->hasMany(Client::class);
+    }
+
 }
