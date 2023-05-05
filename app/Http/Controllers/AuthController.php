@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validatedData = $request->validate([
-            'nickname' => 'required|max:55',
-            'email' => 'email|required|unique:users',
-            'password' => 'required|confirmed',
-        ]);
+        $validatedData = $request->validate();
 
         $validatedData['password'] = Hash::make($request->password);
 
