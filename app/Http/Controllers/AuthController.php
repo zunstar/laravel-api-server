@@ -31,6 +31,12 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        if (!Auth::attempt($credentials)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
         $token = $request->user()->createToken('authToken')->accessToken;
 
         return response()->json(['access_token' => $token], 200);
